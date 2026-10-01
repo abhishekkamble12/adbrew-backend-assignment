@@ -26,7 +26,7 @@ SECRET_KEY = '00000000000000000000000000000000000000000000000000'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 
 # Application definition
@@ -128,6 +128,7 @@ REST_FRAMEWORK = {
     # other settings...
     'DEFAULT_AUTHENTICATION_CLASSES': [],
     'DEFAULT_PERMISSION_CLASSES': [],
+    'EXCEPTION_HANDLER': 'rest.exceptions.exception_handler',
 }
 
 
