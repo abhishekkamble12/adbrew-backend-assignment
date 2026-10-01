@@ -4,8 +4,12 @@ Keeps all MongoDB-specific details (collection access, ObjectId, document
 shape) out of the HTTP layer. Views only deal with plain dicts.
 """
 from datetime import datetime, timezone
+from typing import Any, Dict, List
 
 from pymongo import ASCENDING
+from pymongo.collection import Collection
+
+Todo = Dict[str, Any]
 
 
 class TodoRepository:
@@ -15,15 +19,15 @@ class TodoRepository:
     independent of connection setup and lets tests pass in a fake collection.
     """
 
-    def __init__(self, collection):
+    def __init__(self, collection: Collection) -> None:
         self._collection = collection
 
-    def list_all(self):
+    def list_all(self) -> List[Todo]:
         """Return all TODOs, oldest first."""
         cursor = self._collection.find().sort("created_at", ASCENDING)
         return [self._to_dict(document) for document in cursor]
 
-    def create(self, description):
+    def create(self, description: str) -> Todo:
         """Insert a new TODO and return it in its serialized form."""
         document = {
             "description": description,
@@ -33,7 +37,7 @@ class TodoRepository:
         return self._to_dict({**document, "_id": result.inserted_id})
 
     @staticmethod
-    def _utc_now_millis():
+    def _utc_now_millis() -> datetime:
         """Current UTC time truncated to milliseconds.
 
         BSON dates only store milliseconds, so truncating up front keeps the
@@ -43,7 +47,7 @@ class TodoRepository:
         return now.replace(microsecond=now.microsecond // 1000 * 1000)
 
     @staticmethod
-    def _to_dict(document):
+    def _to_dict(document: Dict[str, Any]) -> Todo:
         """Convert a Mongo document into a JSON-friendly dict.
 
         ObjectId is not JSON serializable, so it is exposed as a string `id`.

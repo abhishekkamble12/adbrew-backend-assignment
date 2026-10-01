@@ -1,10 +1,12 @@
 """Request payload validation for the TODO API."""
+from typing import Any
+
 from rest_framework.exceptions import ValidationError
 
 MAX_DESCRIPTION_LENGTH = 500
 
 
-def validate_todo_payload(data):
+def validate_todo_payload(data: Any) -> str:
     """Validate an incoming TODO payload and return the cleaned description.
 
     Raises DRF's ValidationError, which the framework turns into a 400

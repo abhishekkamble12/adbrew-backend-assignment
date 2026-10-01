@@ -7,6 +7,7 @@ request would be wasteful.
 import os
 
 from pymongo import MongoClient
+from pymongo.database import Database
 
 MONGO_HOST = os.environ.get("MONGO_HOST", "localhost")
 MONGO_PORT = int(os.environ.get("MONGO_PORT", "27017"))
@@ -15,10 +16,10 @@ MONGO_DB_NAME = os.environ.get("MONGO_DB_NAME", "test_db")
 # The client connects lazily, so importing this module never blocks on Mongo.
 # A short server selection timeout makes requests fail fast (and surface as a
 # 503) instead of hanging for pymongo's default 30s when Mongo is down.
-client = MongoClient(
+client: MongoClient = MongoClient(
     host=MONGO_HOST,
     port=MONGO_PORT,
     serverSelectionTimeoutMS=5000,
     tz_aware=True,
 )
-db = client[MONGO_DB_NAME]
+db: Database = client[MONGO_DB_NAME]
