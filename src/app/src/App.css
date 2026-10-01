@@ -36,3 +36,12 @@
     transform: rotate(360deg);
   }
 }
+
+.error {
+  color: #c62828;
+}
+
+.App ul {
+  display: inline-block;
+  text-align: left;
+}
