@@ -1,0 +1,16 @@
+# Runtime data created by the docker-compose volume mounts
+src/db/
+src/tmp/
+
+# Dependencies / build output
+node_modules/
+src/app/build/
+
+# Python
+__pycache__/
+*.pyc
+src/rest/mydatabase
+
+# Local environment
+.env
+.eslintcache
