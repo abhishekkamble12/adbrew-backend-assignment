@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-export const MAX_DESCRIPTION_LENGTH = 500;
+const MAX_DESCRIPTION_LENGTH = 500;
 
 export function TodoForm({ onSubmit }) {
   const [description, setDescription] = useState('');

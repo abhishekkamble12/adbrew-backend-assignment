@@ -1,9 +1,5 @@
-"""Tests for the TODO API.
-
-Run inside the api container:  cd /src/rest && python manage.py test rest
-A small in-memory fake stands in for the Mongo collection, so these tests
-need no running database.
-"""
+# Run with: docker exec api bash -c "cd /src/rest && python manage.py test rest"
+# FakeCollection stands in for Mongo, so no database is needed.
 from types import SimpleNamespace
 from unittest import mock
 

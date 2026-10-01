@@ -11,11 +11,7 @@ todo_repository = TodoRepository(db["todos"])
 
 
 class TodoListView(APIView):
-    """List all TODOs or create a new one.
-
-    Errors are not handled here: validation and database exceptions propagate
-    to `rest.exceptions.exception_handler`, which builds the error response.
-    """
+    # No try/except here: errors propagate to rest.exceptions.exception_handler.
 
     repository = todo_repository
 

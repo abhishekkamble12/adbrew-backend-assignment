@@ -1,16 +1,15 @@
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
 export class ApiError extends Error {
-  constructor(message, status, details = null) {
+  constructor(message, status) {
     super(message);
     this.name = 'ApiError';
     this.status = status;
-    this.details = details;
   }
 }
 
-// The backend always reports errors as {"error": "<message>", "details": {...}}.
-// The fallback covers responses that never reached Django (e.g. a proxy error page).
+// The API always returns {"error": ..., "details": ...}; the fallback is for
+// responses that never reached Django, e.g. a proxy error page.
 function extractErrorMessage(body, status) {
   if (body && typeof body.error === 'string') {
     return body.error;
@@ -38,7 +37,7 @@ async function request(path, options = {}) {
 
   const body = await response.json().catch(() => null);
   if (!response.ok) {
-    throw new ApiError(extractErrorMessage(body, response.status), response.status, body);
+    throw new ApiError(extractErrorMessage(body, response.status), response.status);
   }
   return body;
 }

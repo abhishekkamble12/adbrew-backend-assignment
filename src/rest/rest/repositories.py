@@ -1,8 +1,3 @@
-"""Data access layer for TODO items.
-
-Keeps all MongoDB-specific details (collection access, ObjectId, document
-shape) out of the HTTP layer. Views only deal with plain dicts.
-"""
 from datetime import datetime, timezone
 from typing import Any, Dict, List
 
@@ -13,22 +8,16 @@ Todo = Dict[str, Any]
 
 
 class TodoRepository:
-    """Persists and retrieves TODO items from a MongoDB collection.
-
-    The collection is injected rather than created here, which keeps the class
-    independent of connection setup and lets tests pass in a fake collection.
-    """
+    """All Mongo access for todos. Takes the collection as an argument so tests can pass a fake."""
 
     def __init__(self, collection: Collection) -> None:
         self._collection = collection
 
     def list_all(self) -> List[Todo]:
-        """Return all TODOs, oldest first."""
         cursor = self._collection.find().sort("created_at", ASCENDING)
         return [self._to_dict(document) for document in cursor]
 
     def create(self, description: str) -> Todo:
-        """Insert a new TODO and return it in its serialized form."""
         document = {
             "description": description,
             "created_at": self._utc_now_millis(),
@@ -38,20 +27,14 @@ class TodoRepository:
 
     @staticmethod
     def _utc_now_millis() -> datetime:
-        """Current UTC time truncated to milliseconds.
-
-        BSON dates only store milliseconds, so truncating up front keeps the
-        timestamp returned on create identical to the one later read back.
-        """
+        # BSON stores milliseconds only; truncating here keeps the POST response
+        # identical to what a later GET returns.
         now = datetime.now(timezone.utc)
         return now.replace(microsecond=now.microsecond // 1000 * 1000)
 
     @staticmethod
     def _to_dict(document: Dict[str, Any]) -> Todo:
-        """Convert a Mongo document into a JSON-friendly dict.
-
-        ObjectId is not JSON serializable, so it is exposed as a string `id`.
-        """
+        # ObjectId isn't JSON serializable, so expose it as a string id.
         return {
             "id": str(document["_id"]),
             "description": document.get("description", ""),
