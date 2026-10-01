@@ -9,16 +9,11 @@ export class ApiError extends Error {
   }
 }
 
+// The backend always reports errors as {"error": "<message>", "details": {...}}.
+// The fallback covers responses that never reached Django (e.g. a proxy error page).
 function extractErrorMessage(body, status) {
   if (body && typeof body.error === 'string') {
     return body.error;
-  }
-  if (body && typeof body === 'object') {
-    // DRF validation errors look like {"field": ["message", ...]}
-    const firstFieldErrors = Object.values(body).find(Array.isArray);
-    if (firstFieldErrors && firstFieldErrors.length > 0) {
-      return String(firstFieldErrors[0]);
-    }
   }
   return `Request failed with status ${status}.`;
 }

@@ -66,7 +66,15 @@ test('creates a TODO and refreshes the list from the backend', async () => {
 test('shows a validation error from the backend and keeps the input', async () => {
   fetch
     .mockReturnValueOnce(jsonResponse([]))
-    .mockReturnValueOnce(jsonResponse({ description: ['This field may not be blank.'] }, 400));
+    .mockReturnValueOnce(
+      jsonResponse(
+        {
+          error: 'This field may not be blank.',
+          details: { description: ['This field may not be blank.'] },
+        },
+        400
+      )
+    );
 
   render(<App />);
   await screen.findByText(/no todos yet/i);
@@ -80,7 +88,7 @@ test('shows a validation error from the backend and keeps the input', async () =
 
 test('shows an error with retry when the list cannot be loaded', async () => {
   fetch
-    .mockReturnValueOnce(jsonResponse({ error: 'The database is currently unavailable.' }, 503))
+    .mockReturnValueOnce(jsonResponse({ error: 'The database is currently unavailable.', details: {} }, 503))
     .mockReturnValueOnce(jsonResponse([{ id: '1', description: 'Recovered' }]));
 
   render(<App />);
@@ -90,6 +98,24 @@ test('shows an error with retry when the list cannot be loaded', async () => {
   userEvent.click(screen.getByRole('button', { name: /retry/i }));
 
   expect(await screen.findByText('Recovered')).toBeInTheDocument();
+});
+
+test('falls back to a generic message when the error body is not JSON', async () => {
+  fetch.mockReturnValueOnce(
+    Promise.resolve({ ok: false, status: 502, json: () => Promise.reject(new SyntaxError('not json')) })
+  );
+
+  render(<App />);
+
+  expect(await screen.findByRole('alert')).toHaveTextContent('Request failed with status 502.');
+});
+
+test('shows a network error when the server is unreachable', async () => {
+  fetch.mockReturnValueOnce(Promise.reject(new TypeError('Failed to fetch')));
+
+  render(<App />);
+
+  expect(await screen.findByRole('alert')).toHaveTextContent('Unable to reach the server.');
 });
 
 test('disables submit for blank input', async () => {
