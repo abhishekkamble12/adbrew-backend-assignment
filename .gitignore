@@ -9,7 +9,6 @@ src/app/build/
 # Python
 __pycache__/
 *.pyc
-src/rest/mydatabase
 
 # Local environment
 .env
