@@ -10,23 +10,26 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
+import os
+import sys
 from pathlib import Path
-from datetime import timedelta
-import sys, os
-from corsheaders.defaults import default_headers
+
+
+def env_list(name, default):
+    """Read a comma-separated environment variable as a list of strings."""
+    return [item.strip() for item in os.environ.get(name, default).split(',') if item.strip()]
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-print( "base dir path", BASE_DIR)
 sys.path.append(os.path.join(BASE_DIR, ".."))
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
-SECRET_KEY = '00000000000000000000000000000000000000000000000000'
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+# Deployment-specific values come from the environment. The defaults are for
+# local development only; override them in any real deployment.
+# See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', '00000000000000000000000000000000000000000000000000')
+DEBUG = os.environ.get('DJANGO_DEBUG', 'true').lower() == 'true'
+ALLOWED_HOSTS = env_list('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1')
 
 
 # Application definition
@@ -92,7 +95,6 @@ STATIC_URL = '/static/'
 
 
 REST_FRAMEWORK = {
-    # other settings...
     'DEFAULT_AUTHENTICATION_CLASSES': [],
     'DEFAULT_PERMISSION_CLASSES': [],
     # The default (AnonymousUser) lives in django.contrib.auth, which is not installed.
@@ -100,7 +102,6 @@ REST_FRAMEWORK = {
     'EXCEPTION_HANDLER': 'rest.exceptions.exception_handler',
 }
 
-
-CORS_ORIGIN_ALLOW_ALL = True # If this is used then `CORS_ORIGIN_WHITELIST` will not have any effect
-CORS_ALLOW_CREDENTIALS = True
-
+# Only the React dev server may call the API from a browser. No cookies are
+# used, so credentials are not allowed cross-origin.
+CORS_ALLOWED_ORIGINS = env_list('CORS_ALLOWED_ORIGINS', 'http://localhost:3000,http://127.0.0.1:3000')
