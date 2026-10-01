@@ -53,7 +53,7 @@ Requirements: Docker with Docker Compose v2 (`docker compose`). The older `docke
    You should see `app` (port 3000), `api` (port 8000) and `mongo` (port 27017).
 
 6. Wait for the services to be ready:
-   - **app:** the first start runs `yarn install`, which can take a few minutes. It's ready when `docker logs app` shows `Compiled successfully!`.
+   - **app:** the first start runs `yarn install` into the bind-mounted `src/app/node_modules`. That takes a few minutes on Linux/macOS, but took about 15 minutes on Docker Desktop for Windows, where bind mounts are slow. Later starts are much faster. It's ready when `docker logs app` shows `Compiled successfully!`.
    - **mongo:** it can take up to about a minute to accept connections, especially on Windows (see [Known issues](#known-issues-and-limitations)). Until it does, the API returns `503`.
 
 7. Open http://localhost:3000 for the UI. The API is at http://localhost:8000/todos.
