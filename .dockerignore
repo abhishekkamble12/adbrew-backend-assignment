@@ -1,0 +1,6 @@
+# The Dockerfile only copies src/requirements.txt; the source code is mounted
+# at runtime by docker-compose. Excluding everything else keeps the build
+# context tiny and avoids sending node_modules and the live Mongo data
+# files (src/db) to the Docker daemon.
+*
+!src/requirements.txt
